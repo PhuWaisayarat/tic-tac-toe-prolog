@@ -1,26 +1,18 @@
-:- module(tic_tac_toe, []).
-
 :- use_module('presolved_tic_tac_toe.prolog', [extension/3, opposite/2]).
 
-% :- dynamic(start_parity/1).
-
-start_parity(x).
+start_parity(first).
+second_parity(second).
 
 check_parity(P) :-
-	(    member(P, [x,o])
+	(    member(P, [first,second])
 	-> true
-	;    throw(error(domain_error(x_or_o, P)))).
+	;    throw(error(domain_error(first_or_second, P)))).
 	
 flip_parity(P1, P2) :-
 	ground(P1),
-	(    (P1 = x) -> (P2 = o)
-	;    (P1 = o) -> (P2 = x)
+	(    (P1 = first) -> (P2 = second)
+	;    (P1 = second) -> (P2 = first)
 	).
-	
-second_parity(P) :- 
-    start_parity(PrevP),
-	check_parity(PrevP),
-	flip_parity(PrevP, P).
 
 parity(Board, P) :-
 	start_parity(StartParity),
@@ -36,8 +28,8 @@ validate_board([], _) :- !.
 validate_board(Board, Parity) :-
 	(   (   append(_, [Expression], Board),
 	        Expression = '='(PrevParity,_),
-		    ((PrevParity = x, Parity = o)
-			;(PrevParity = o, Parity = x))
+		    ((PrevParity = first, Parity = second)
+			;(PrevParity = second, Parity = first))
 		)
 	-> true
 	;   throw(error(domain_error(alternating_parity, Board)))
@@ -164,7 +156,7 @@ solution([], _, 7). % strategy 5, game start, assume opponent is not perfect
 solution(Board, Parity, Solution) :- 
 	mark_center(Board, Parity, Solution), !. % strategy 5, midgame
 solution(Board, Parity, Solution) :- 
-	opposite_corner(Board, Parity, Solution) % strategy 6
+	opposite_corner(Board, Parity, Solution), !. % strategy 6
 solution(Board, Parity, Solution) :- 
 	empty_corner(Board, Parity, Solution), !. % strategy 7
 solution(Board, Parity, Solution) :- 
